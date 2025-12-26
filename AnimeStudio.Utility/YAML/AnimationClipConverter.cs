@@ -239,6 +239,12 @@ namespace AnimeStudio
                     if (clip.m_ACLClip.IsSet)
                         index += (int)clip.m_ACLClip.CurveCount;
                     GenericBinding binding = bindings.FindBinding(index);
+
+                    if (binding == null) {
+                        curveIndex++;
+                        continue;
+                    }
+
                     string path = GetCurvePath(tos, binding.path);
                     if (binding.typeID == ClassIDType.Transform)
                     {

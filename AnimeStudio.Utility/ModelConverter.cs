@@ -983,6 +983,12 @@ namespace AnimeStudio
         private void ReadCurveData(ImportedKeyframedAnimation iAnim, AnimationClipBindingConstant m_ClipBindingConstant, int index, float time, float[] data, int offset, ref int curveIndex)
         {
             var binding = m_ClipBindingConstant.FindBinding(index);
+
+            if (binding == null) {
+                curveIndex++;
+                return;
+            }
+
             if (binding.typeID == ClassIDType.SkinnedMeshRenderer) //BlendShape
             {
                 var channelName = GetChannelNameFromHash(binding.attribute);

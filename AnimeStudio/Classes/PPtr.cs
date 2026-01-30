@@ -76,7 +76,7 @@ namespace AnimeStudio
         {
             if (TryGetAssetsFile(out var sourceFile))
             {
-                if (sourceFile.ObjectsDic.TryGetValue(m_PathID, out var obj))
+                if (sourceFile?.ObjectsDic?.TryGetValue(m_PathID, out var obj) == true)
                 {
                     if (obj is T variable)
                     {

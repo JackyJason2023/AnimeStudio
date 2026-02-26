@@ -457,7 +457,7 @@ namespace AnimeStudio
                     var total = stream.Length;
 
                     OffsetData.TryGetValue(reader.FileName, out var manualOffsets);
-                    bool isManualOffsets = (manualOffsets != null && manualOffsets.Count > 0);
+                    bool isManualOffsets = (manualOffsets != null && manualOffsets.Count > 0) && Game.Type.IsArknightsEndfieldGroup();
                     IEnumerable<long> offsetsEnumerable = isManualOffsets
                         ? manualOffsets
                         : stream.GetOffsets(reader.FullPath);

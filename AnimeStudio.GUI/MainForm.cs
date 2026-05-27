@@ -281,6 +281,14 @@ namespace AnimeStudio.GUI
                 }
             }
 
+            // See https://github.com/Eleiyas/Z3-Asset-Map 
+            var paths = File.Exists("./Maps/Z3-AssetIndex-Eleiyas.json")
+                ? JsonConvert.DeserializeObject<Dictionary<ulong, string>>(File.ReadAllText("./Maps/Z3-AssetIndex-Eleiyas.json"))
+                : new Dictionary<ulong, string>();
+
+            Studio.Paths = paths;
+            AssetsHelper.Paths = paths;
+
             MapNameComboBox.SelectedIndexChanged += new EventHandler(specifyNameComboBox_SelectedIndexChanged);
             if (!string.IsNullOrEmpty(Properties.Settings.Default.selectedCABMapName))
             {
@@ -946,6 +954,7 @@ namespace AnimeStudio.GUI
         {
             previewPanel.BackgroundImage = Properties.Resources.preview;
             previewPanel.BackgroundImageLayout = ImageLayout.Center;
+            previewPanel.ContextMenuStrip = null;
             classTextBox.Visible = false;
             assetInfoLabel.Visible = false;
             assetInfoLabel.Text = null;
@@ -1624,6 +1633,7 @@ namespace AnimeStudio.GUI
             imageTexture?.Dispose();
             imageTexture = bitmap;
             previewPanel.BackgroundImage = imageTexture.Bitmap;
+            previewPanel.ContextMenuStrip = previewContextMenuStrip;
             if (imageTexture.Width > previewPanel.Width || imageTexture.Height > previewPanel.Height)
                 previewPanel.BackgroundImageLayout = ImageLayout.Zoom;
             else
@@ -1638,13 +1648,11 @@ namespace AnimeStudio.GUI
 
         private void SetProgressBarValue(int value)
         {
+            if (value < 0) value = 0;
+            if (value > 100) value = 100;
+
             if (InvokeRequired)
             {
-                if (value < 0)
-                    value = 0;
-                if (value > 100)
-                    value = 100;
-
                 var result = BeginInvoke(new Action(() => { progressBar1.Value = value; }));
                 result.AsyncWaitHandle.WaitOne();
             }
@@ -1680,6 +1688,7 @@ namespace AnimeStudio.GUI
             classesListView.Items.Clear();
             classesListView.Groups.Clear();
             previewPanel.BackgroundImage = Properties.Resources.preview;
+            previewPanel.ContextMenuStrip = null;
             imageTexture?.Dispose();
             imageTexture = null;
             previewPanel.BackgroundImageLayout = ImageLayout.Center;
@@ -1733,6 +1742,21 @@ namespace AnimeStudio.GUI
         private void copyToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Clipboard.SetDataObject(tempClipboard);
+        }
+
+        private void copyImageToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (imageTexture == null)
+                return;
+
+            var data = new DataObject();
+            using (var ms = new MemoryStream())
+            {
+                imageTexture.Bitmap.Save(ms, System.Drawing.Imaging.ImageFormat.Png);
+                data.SetData("PNG", false, ms);
+                data.SetImage(imageTexture.Bitmap);
+                Clipboard.SetDataObject(data, true);
+            }
         }
 
         private void exportSelectedAssetsToolStripMenuItem_Click(object sender, EventArgs e)
